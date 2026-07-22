@@ -1141,4 +1141,20 @@ p.view-subtitle {
   }
 }
 
+/* Plotly wrapper constraints to prevent horizontal layout overflow */
+#shap-bar-chart, 
+#explain-shap-bar-chart, 
+#global-importance-chart {
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Ensure parents of charts have min-width: 0 and overflow: hidden to allow shrinking */
+.predict-split-grid .glass-panel,
+.copilot-split-grid .glass-panel {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
 

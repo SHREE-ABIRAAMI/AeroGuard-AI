@@ -194,8 +194,25 @@ def train_model():
     return metadata
 
 def load_model():
+    ensure_directories()
     if not os.path.exists(MODEL_FILE):
-        return train_model()
+        # Try copying from root models/ folder or backend/ folder
+        root_dir = os.path.dirname(BASE_DIR)
+        root_models_dir = os.path.join(root_dir, "models")
+        backend_dir = os.path.join(root_dir, "backend")
+        
+        copied = False
+        for source_dir in [root_models_dir, backend_dir]:
+            src = os.path.join(source_dir, "engine_model.pkl")
+            if os.path.exists(src):
+                import shutil
+                shutil.copy(src, MODEL_FILE)
+                print(f"Copied pre-trained model from {src} to {MODEL_FILE}")
+                copied = True
+                break
+                
+        if not copied:
+            return train_model()
         
     with open(MODEL_FILE, "rb") as f:
         return pickle.load(f)

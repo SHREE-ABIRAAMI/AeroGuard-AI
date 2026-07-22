@@ -1,16 +1,3 @@
----
-title: AeroGuard AI
-emoji: 🏃
-colorFrom: indigo
-colorTo: green
-sdk: docker
-python_version: '3.12'
-app_file: app/main.py
-pinned: false
-license: mit
-short_description: Smart predictive maintenance for aviation systems
----
-
 # ✈️ AeroGuard AI – Predictive Maintenance Intelligence Platform
 
 > Transforming Industrial Sensor Data into Intelligent Decisions.
@@ -56,7 +43,7 @@ graph TD
 * **Machine Learning**: XGBoost (Piecewise-linear regression), Scikit-learn, Pandas, NumPy.
 * **Explainability**: SHAP (SHapley Additive Explanations).
 * **Cognitive Agent**: Gemini LLM via `google-generativeai` (with offline keyword routing).
-* **Version Control & Deployment**: Git, GitHub, Render, Hugging Face Spaces.
+* **Version Control & Deployment**: Git, GitHub, AWS (Amazon Web Services), Render.
 
 ---
 

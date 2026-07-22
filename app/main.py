@@ -256,7 +256,12 @@ async def root(request: Request):
     Serves the primary UI dashboard and SaaS Landing page.
     """
     try:
-        return templates.TemplateResponse("index.html", {"request": request})
+        try:
+            # Newer Starlette signature (Starlette >= 0.28.0)
+            return templates.TemplateResponse(request, "index.html")
+        except TypeError:
+            # Older Starlette signature (Starlette < 0.28.0)
+            return templates.TemplateResponse("index.html", {"request": request})
     except Exception as e:
         import traceback
         from fastapi.responses import PlainTextResponse

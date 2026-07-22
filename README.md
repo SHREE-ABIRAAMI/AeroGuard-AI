@@ -15,6 +15,10 @@ short_description: Smart predictive maintenance for aviation systems
 
 > Transforming Industrial Sensor Data into Intelligent Decisions.
 
+**🌐 Deployed Application Demo:** [AeroGuard AI Live Demo](https://shree-abi-aeroguard-ai-docker.hf.space) | [Hugging Face Space](https://huggingface.co/spaces/SHREE-ABI/AeroGuard-AI-Docker)
+
+---
+
 AeroGuard AI is an enterprise-grade decision-support platform designed for aerospace operations, industrial asset management, and airline maintenance engineering teams. Using the **NASA CMAPSS Turbofan Engine Degradation Dataset**, the platform monitors real-time telemetry, forecasts Remaining Useful Life (RUL), runs What-If servicing simulations, explains ML predictions via SHAP, and computes operational/financial business impact.
 
 ---

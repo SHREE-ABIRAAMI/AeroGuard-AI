@@ -53,6 +53,8 @@ TRAIN_DF = None
 TEST_DF = None
 RUL_DF = None
 TEST_FEATURES_DF = None
+TEST_FEATURES_BY_UNIT = {}
+TEST_DF_BY_UNIT = {}
 
 # Global state for simulated fleet (mission control)
 SIMULATED_FLEET = {}
@@ -101,7 +103,7 @@ async def startup_event():
     FastAPI startup hook to load dataset, train/load the XGBoost model,
     pre-calculate telemetry features, and spin up the simulation.
     """
-    global TRAIN_DF, TEST_DF, RUL_DF, TEST_FEATURES_DF
+    global TRAIN_DF, TEST_DF, RUL_DF, TEST_FEATURES_DF, TEST_FEATURES_BY_UNIT, TEST_DF_BY_UNIT
     log_event("AeroGuard AI backend gateway starting...")
     try:
         log_event("Loading NASA CMAPSS telemetry dataset...")
@@ -116,6 +118,11 @@ async def startup_event():
         TEST_FEATURES_DF = predictor.engineer_features(TEST_DF)
         log_event("Pre-calculation complete. Telemetry feature cache populated.")
         
+        # Populate optimized unit-specific lookups
+        log_event("Indexing datasets by unit number for rapid lookups...")
+        TEST_FEATURES_BY_UNIT = {unit: df.copy() for unit, df in TEST_FEATURES_DF.groupby("unit_number")}
+        TEST_DF_BY_UNIT = {unit: df.copy() for unit, df in TEST_DF.groupby("unit_number")}
+        
         log_event("Initializing fleet simulation states...")
         initialize_fleet_simulation()
         log_event("Fleet monitoring simulation online.")
@@ -129,7 +136,7 @@ def get_engine_data_at_cycle(unit_number: int, cycle: int, sim_state=None):
     telemetry feature cache for instantaneous retrieval (~0.1ms), falling back to on-the-fly
     calculations only if what-if multipliers are active in the simulator.
     """
-    global TEST_FEATURES_DF, TEST_DF
+    global TEST_FEATURES_DF, TEST_DF, TEST_FEATURES_BY_UNIT, TEST_DF_BY_UNIT
     
     # Check if there are active multipliers in the simulation state
     has_multipliers = False
@@ -141,7 +148,12 @@ def get_engine_data_at_cycle(unit_number: int, cycle: int, sim_state=None):
                 
     if has_multipliers:
         # What-If is active: Reconstruct history and calculate features on-the-fly
-        unit_data = TEST_DF[(TEST_DF["unit_number"] == unit_number) & (TEST_DF["time_in_cycles"] <= cycle)].copy()
+        unit_df = TEST_DF_BY_UNIT.get(unit_number)
+        if unit_df is not None:
+            unit_data = unit_df[unit_df["time_in_cycles"] <= cycle].copy()
+        else:
+            unit_data = TEST_DF[(TEST_DF["unit_number"] == unit_number) & (TEST_DF["time_in_cycles"] <= cycle)].copy()
+            
         if len(unit_data) == 0:
             rows = []
             for c in range(1, cycle + 1):
@@ -159,13 +171,22 @@ def get_engine_data_at_cycle(unit_number: int, cycle: int, sim_state=None):
         unit_history = unit_data
     else:
         # No What-If: retrieve instantly from the pre-calculated features!
-        last_row = TEST_FEATURES_DF[(TEST_FEATURES_DF["unit_number"] == unit_number) & (TEST_FEATURES_DF["time_in_cycles"] == cycle)].copy()
-        if len(last_row) == 0:
-            # Fallback to the latest cycle available in cache for this unit
-            last_row = TEST_FEATURES_DF[TEST_FEATURES_DF["unit_number"] == unit_number].iloc[[-1]].copy()
+        unit_features = TEST_FEATURES_BY_UNIT.get(unit_number)
+        if unit_features is not None:
+            last_row = unit_features[unit_features["time_in_cycles"] == cycle].copy()
+            if len(last_row) == 0:
+                last_row = unit_features.iloc[[-1]].copy()
+        else:
+            last_row = TEST_FEATURES_DF[(TEST_FEATURES_DF["unit_number"] == unit_number) & (TEST_FEATURES_DF["time_in_cycles"] == cycle)].copy()
+            if len(last_row) == 0:
+                last_row = TEST_FEATURES_DF[TEST_FEATURES_DF["unit_number"] == unit_number].iloc[[-1]].copy()
         
         # Pull history slice silently if needed for baseline comparisons
-        unit_history = TEST_DF[(TEST_DF["unit_number"] == unit_number) & (TEST_DF["time_in_cycles"] <= cycle)]
+        unit_df = TEST_DF_BY_UNIT.get(unit_number)
+        if unit_df is not None:
+            unit_history = unit_df[unit_df["time_in_cycles"] <= cycle]
+        else:
+            unit_history = TEST_DF[(TEST_DF["unit_number"] == unit_number) & (TEST_DF["time_in_cycles"] <= cycle)]
         
     return last_row, unit_history
 

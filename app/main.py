@@ -699,11 +699,48 @@ async def tick_simulation():
     Ticks all active simulated engines forward by 1 operating cycle.
     If an engine reaches its lifespan limit, it stops accumulating cycles.
     """
-    log_event("Simulation time advanced: Ticked active simulated engines by 1 cycle.")
+    # 1. Increment cycles
+    active_units = []
     for unit in SIMULATED_FLEET:
         state = SIMULATED_FLEET[unit]
         if state["current_cycle"] < state["total_lifespan"]:
             state["current_cycle"] += 1
+            active_units.append(unit)
+            
+    # 2. Generate highly realistic telemetry pipeline logs
+    log_event(f"Simulation Pipeline Tick: Advanced {len(active_units)} active turbofans by 1 cycle.")
+    
+    if active_units:
+        import random
+        # Select 2 random engines to log detailed telemetry intake
+        log_units = random.sample(active_units, min(2, len(active_units)))
+        for unit in log_units:
+            state = SIMULATED_FLEET[unit]
+            cycle = state["current_cycle"]
+            
+            # Fetch actual sensor values for this cycle from TEST_DF to make it 100% realistic!
+            try:
+                row = TEST_DF[(TEST_DF["unit_number"] == unit) & (TEST_DF["time_in_cycles"] == cycle)]
+                if not row.empty:
+                    t24 = round(float(row.iloc[0]["sensor_2"]), 2)
+                    t30 = round(float(row.iloc[0]["sensor_3"]), 2)
+                    p30 = round(float(row.iloc[0]["sensor_7"]), 2)
+                    log_event(f"[Telemetry Intake] Engine #{unit}: T24={t24}R, T30={t30}R, P30={p30}psia (Cycle {cycle})")
+            except Exception:
+                log_event(f"[Telemetry Intake] Engine #{unit} packet received (Cycle {cycle})")
+                
+        # Run batch prediction event logs for 1 engine
+        predict_unit = random.choice(active_units)
+        try:
+            metrics = compute_engine_metrics(predict_unit, include_explainability=False)
+            rul = int(metrics["predicted_rul"])
+            risk = metrics["risk_level"]
+            log_event(f"[ML Inference Gateway] RUL Forecast Engine #{predict_unit}: {rul} cycles remaining ({risk})")
+            if risk in ["Critical", "High Risk"]:
+                log_event(f"[Alert System] Engine #{predict_unit} showing anomalous wear trajectory (Priority {metrics['maintenance_priority']})")
+        except Exception:
+            pass
+            
     return {"status": "success", "message": "Simulated time advanced by 1 cycle."}
 
 @app.get("/api/system-logs")

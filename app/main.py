@@ -255,7 +255,12 @@ async def root(request: Request):
     """
     Serves the primary UI dashboard and SaaS Landing page.
     """
-    return templates.TemplateResponse("index.html", {"request": request})
+    try:
+        return templates.TemplateResponse("index.html", {"request": request})
+    except Exception as e:
+        import traceback
+        from fastapi.responses import PlainTextResponse
+        return PlainTextResponse(traceback.format_exc(), status_code=500)
 
 @app.get("/api/model-info")
 async def get_model_info():

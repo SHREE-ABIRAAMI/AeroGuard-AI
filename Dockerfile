@@ -4,7 +4,8 @@ FROM python:3.10-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    HOME=/home/user
+    HOME=/home/user \
+    PYTHONPATH=/home/user/app/app
 
 # Create a non-root user for security (Hugging Face requires UID 1000)
 RUN useradd -m -u 1000 user

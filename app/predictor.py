@@ -72,16 +72,20 @@ def copy_or_load_dataset():
     
     # Check if files already exist in our workspace data folder
     if not (os.path.exists(train_path) and os.path.exists(test_path) and os.path.exists(rul_path)):
-        # Try copying from existing backend/data/ folder if available
-        backend_data_dir = os.path.join(BASE_DIR, "backend", "data")
-        if os.path.exists(backend_data_dir):
-            import shutil
-            for f in ["train_FD001.txt", "test_FD001.txt", "RUL_FD001.txt"]:
-                src = os.path.join(backend_data_dir, f)
-                dst = os.path.join(DATA_DIR, f)
-                if os.path.exists(src):
-                    shutil.copy(src, dst)
-                    print(f"Copied {f} to {DATA_DIR}")
+        # Try copying from existing root data/ folder or backend/data/ folder if available
+        root_dir = os.path.dirname(BASE_DIR)
+        root_data_dir = os.path.join(root_dir, "data")
+        backend_data_dir = os.path.join(root_dir, "backend", "data")
+        
+        for source_dir in [root_data_dir, backend_data_dir]:
+            if os.path.exists(source_dir):
+                import shutil
+                for f in ["train_FD001.txt", "test_FD001.txt", "RUL_FD001.txt"]:
+                    src = os.path.join(source_dir, f)
+                    dst = os.path.join(DATA_DIR, f)
+                    if os.path.exists(src) and not os.path.exists(dst):
+                        shutil.copy(src, dst)
+                        print(f"Copied {f} to {DATA_DIR}")
     
     # Read files
     if os.path.exists(train_path) and os.path.exists(test_path) and os.path.exists(rul_path):

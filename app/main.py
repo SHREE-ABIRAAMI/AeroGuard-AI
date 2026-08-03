@@ -603,6 +603,55 @@ async def copilot_chat(req: CopilotRequest):
             explain_data = metrics["explainability"]
             context_shifted = True
             log_event(f"Copilot query redirected to requested Engine #{unit_number} context")
+        elif 1 <= target_unit <= 100:
+            # Engine is in the broader NASA dataset (1-100) but not in the active simulator (1-30).
+            # We calculate its current status from its final cycle in the dataset on-the-fly!
+            try:
+                # 1. Fetch final cycle from dataset
+                unit_df = TEST_DF_BY_UNIT.get(target_unit)
+                if unit_df is None or unit_df.empty:
+                    unit_df = TEST_DF[TEST_DF["unit_number"] == target_unit]
+                
+                if not unit_df.empty:
+                    last_cycle = int(unit_df["time_in_cycles"].max())
+                    
+                    # 2. Get features
+                    unit_features = TEST_FEATURES_BY_UNIT.get(target_unit)
+                    if unit_features is None or unit_features.empty:
+                        unit_features = TEST_FEATURES_DF[TEST_FEATURES_DF["unit_number"] == target_unit]
+                        
+                    if not unit_features.empty:
+                        last_row = unit_features[unit_features["time_in_cycles"] == last_cycle].copy()
+                        if last_row.empty:
+                            last_row = unit_features.iloc[[-1]].copy()
+                    else:
+                        last_row = TEST_FEATURES_DF[TEST_FEATURES_DF["unit_number"] == target_unit].iloc[[-1]].copy()
+                    
+                    # 3. Model predict
+                    model_meta = predictor.get_model()
+                    predicted_rul = predictor.predict_rul(last_row, model_meta["feature_cols"])
+                    health_score = predictor.calculate_health_score(predicted_rul)
+                    risk_level, color = predictor.classify_risk(predicted_rul)
+                    
+                    # Parse anomalies
+                    baseline_row = unit_df.iloc[0]
+                    current_row = unit_df.iloc[-1]
+                    anomalies = predictor.parse_sensor_anomalies(current_row, baseline_row)
+                    
+                    # Generate priority
+                    rec = recommendation.generate_maintenance_recommendation(predicted_rul, health_score, anomalies)
+                    priority = rec["priority_code"]
+                    
+                    unit_number = target_unit
+                    cycle = last_cycle
+                    context_shifted = True
+                    log_event(f"Copilot query resolved for NASA dataset Engine #{unit_number} (out of simulator)")
+            except Exception as e:
+                log_event(f"Failed to query dataset Engine #{target_unit}: {e}")
+        else:
+            # Requested engine is completely invalid
+            reply = f"**Error: Engine ID #{target_unit} is invalid.** The NASA CMAPSS dataset contains records for engines **1 to 100**. Our active dashboard fleet simulation tracks engines **1 to 30**."
+            return {"reply": reply}
 
     log_event(f"Copilot query received for Engine #{unit_number}: '{req.question[:30]}...'")
     t0 = time.time()

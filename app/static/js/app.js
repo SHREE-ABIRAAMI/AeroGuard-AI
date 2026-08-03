@@ -1054,7 +1054,7 @@ async function sendCopilotChat() {
         predicted_rul: context.predicted_rul,
         health_score: context.health_score,
         risk_level: context.risk_level,
-        priority: context.priority,
+        priority: context.priority || context.maintenance_priority || "",
         anomalies: context.anomalies,
         question: query
       })

@@ -261,7 +261,7 @@ class CopilotRequest(BaseModel):
     predicted_rul: float
     health_score: float
     risk_level: str
-    priority: str
+    priority: str = ""
     anomalies: List[dict]
     question: str
 
@@ -678,6 +678,7 @@ async def copilot_chat(req: CopilotRequest):
             "predicted_rul": round(predicted_rul, 1),
             "health_score": round(health_score, 1),
             "risk_level": risk_level,
+            "priority": priority,
             "maintenance_priority": priority,
             "anomalies": anomalies,
             "explainability": explain_data

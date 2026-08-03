@@ -8,7 +8,7 @@
   
   <!-- Font Awesome & Fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="/static/css/style.css?v=6.0">
+  <link rel="stylesheet" href="/static/css/style.css?v=7.0">
   
   <!-- Plotly charting engine -->
   <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
@@ -793,10 +793,10 @@
           </div>
         </div>
 
-        <div class="dashboard-split-grid copilot-split-grid" style="flex-grow: 1; min-height: 0; height: 100%;">
+        <div style="flex-grow: 1; min-height: 0; height: 100%; width: 100%;">
           
-          <!-- Left Column: AI Chatbot -->
-          <div class="glass-panel" style="display: flex; flex-direction: column; height: 100%; padding: 0; margin-bottom: 0; overflow: hidden;">
+          <!-- Full-Width AI Chatbot -->
+          <div class="glass-panel" style="display: flex; flex-direction: column; height: 100%; padding: 0; margin-bottom: 0; overflow: hidden; width: 100%;">
             
             <!-- Chips queries -->
             <div style="padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.15); display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; flex-shrink: 0;">
@@ -825,18 +825,6 @@
               <button id="btn-chat-send" style="padding: 0 16px; font-size: 0.85rem;">
                 <i class="fa-solid fa-paper-plane"></i>
               </button>
-            </div>
-
-          </div>
-
-          <!-- Right Column: XAI Metrics & Charts (Scrollable) -->
-          <div style="display: flex; flex-direction: column; gap: 20px; height: 100%; overflow-y: auto; padding-right: 4px;">
-            
-            <!-- Local SHAP Attributions Chart -->
-            <div class="glass-panel" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 0; height: 100%;">
-              <h3 style="font-size: 0.95rem; font-weight: 700; color: white; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">Local SHAP Attributions (Active Engine Focus)</h3>
-              <p id="explain-shap-desc" style="font-size: 0.75rem; color: var(--text-dim); font-style: italic; line-height: 1.4;">Please run a prediction or select a simulated engine to generate local SHAP attributions.</p>
-              <div id="explain-shap-bar-chart" style="width: 100%; flex-grow: 1;"></div>
             </div>
 
           </div>
@@ -1018,6 +1006,6 @@
   <div id="toast-container"></div>
 
   <!-- JS script loading -->
-  <script src="/static/js/app.js?v=6.0"></script>
+  <script src="/static/js/app.js?v=7.0"></script>
 </body>
 </html>

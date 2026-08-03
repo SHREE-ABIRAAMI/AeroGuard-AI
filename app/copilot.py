@@ -63,27 +63,7 @@ def get_offline_response(question, unit_number, cycle, predicted_rul, health_sco
     if any(greet in q for greet in ["hello", "hi ", "hey", "greetings", "whats up"]):
         return f"**AeroGuard Copilot Online.** Greetings, engineer. I am ready to assist with diagnostics for Engine #{unit_number} at cycle {cycle}. What system anomalies are we troubleshooting today?"
         
-    # 3. Explainable AI / SHAP / Why / Factors / Causes
-    if any(kw in q for kw in ["explain", "shap", "why", "contributor", "attributions", "feature", "factor", "reason", "cause", "xai"]):
-        if anomalies:
-            anom_list = []
-            for a in anomalies:
-                # Calculate simulated impact based on the deviation percentage
-                impact = abs(a['deviation_pct'] * 1.2)
-                anom_list.append(f"- **{a['label']} ({a['sensor']})**: Contribution of +{impact:.1f} cycles wear due to {a['status'].lower()} drift ({a['deviation_pct']}%).")
-            anoms_text = "\n".join(anom_list)
-            return f"**Explainable AI (SHAP) Attribution Report for Engine #{unit_number}:**\nOur SHAP attribution models indicate the following key contributors to the predicted RUL of **{int(predicted_rul)} cycles**:\n{anoms_text}\n- **Baseline Lifecycle Wear**: +22.4 cycles wear based on operating cycles ({cycle} cycles elapsed).\n\nThis explains the estimated health index of **{health_score}%**."
-        else:
-            return f"**Explainable AI (SHAP) Attribution Report for Engine #{unit_number}:**\nNo active anomalies or significant sensor drifts detected for Engine #{unit_number} (Health: {health_score}%). The predicted RUL of **{int(predicted_rul)} cycles** is primarily driven by nominal lifecycle wear over the {cycle} operating cycles elapsed."
-
-    # 4. Fix / Repair / Action / Maintenance / Sandbox / Solution
-    if any(kw in q for kw in ["fix", "repair", "service", "maintenance", "what can i do", "what should i do", "recommendation", "action", "remedy", "wash", "bearing", "overhaul"]):
-        if risk_level in ["Critical", "High Risk"]:
-            return f"**Maintenance Action Plan for Engine #{unit_number}:**\nImmediate intervention is required (Priority: {risk_level}). Based on active sensor drifts, I recommend:\n1. **Compressor Core Wash**: To clean fouling and restore thermal margins.\n2. **Bearing & Shaft Lubrication**: To reduce speed vibration friction.\n3. **Full Overhaul**: If wear exceeds thresholds (RUL is critical at {int(predicted_rul)} cycles)."
-        else:
-            return f"**Maintenance Action Plan for Engine #{unit_number}:**\nEngine status is nominal (Low Risk). No immediate maintenance is required. You can use the What-If Sandbox to simulate maintenance effects like bearing replacements (+60 cycles RUL) or core washes (+35 cycles RUL) to extend its lifetime."
-
-    # 5. Sensor specific troubleshooting
+    # 3. Sensor specific troubleshooting (most specific)
     if any(kw in q for kw in ["sensor 11", "ps30", "static pressure"]):
         return "**Ps30 Static Pressure (Sensor 11) Analysis:** The static pressure at the High Pressure Compressor (HPC) outlet is a critical indicator of aerodynamic loading. Upward drift indicates backpressure build-up, typically caused by compressor blade fouling or nozzle guide vane erosion. Cleaning or borescope inspection is recommended."
         
@@ -92,6 +72,25 @@ def get_offline_response(question, unit_number, cycle, predicted_rul, health_sco
         
     if any(kw in q for kw in ["sensor 7", "p30", "hpc pressure"]):
         return "**P30 Core Pressure (Sensor 7) Analysis:** A downward drift in P30 total pressure points to pressure leakage, stator seal degradation, or blade profile warping in the HPC stages. It leads to a drop in thrust efficiency and requires close inspection during the next borescope check."
+
+    # 4. Fix / Repair / Action / Maintenance / Sandbox / Solution
+    if any(kw in q for kw in ["fix", "repair", "service", "maintenance", "what can i do", "what should i do", "recommendation", "action", "remedy", "wash", "bearing", "overhaul"]):
+        if risk_level in ["Critical", "High Risk"]:
+            return f"**Maintenance Action Plan for Engine #{unit_number}:**\nImmediate intervention is required (Priority: {risk_level}). Based on active sensor drifts, I recommend:\n1. **Compressor Core Wash**: To clean fouling and restore thermal margins.\n2. **Bearing & Shaft Lubrication**: To reduce speed vibration friction.\n3. **Full Overhaul**: If wear exceeds thresholds (RUL is critical at {int(predicted_rul)} cycles)."
+        else:
+            return f"**Maintenance Action Plan for Engine #{unit_number}:**\nEngine status is nominal (Low Risk). No immediate maintenance is required. You can use the What-If Sandbox to simulate maintenance effects like bearing replacements (+60 cycles RUL) or core washes (+35 cycles RUL) to extend its lifetime."
+
+    # 5. Explainable AI / SHAP / Why / Factors / Causes (general reasons)
+    if any(kw in q for kw in ["explain", "shap", "why", "contributor", "attributions", "feature", "factor", "reason", "cause", "xai"]):
+        if anomalies:
+            anom_list = []
+            for a in anomalies:
+                impact = abs(a['deviation_pct'] * 1.2)
+                anom_list.append(f"- **{a['label']} ({a['sensor']})**: Contribution of +{impact:.1f} cycles wear due to {a['status'].lower()} drift ({a['deviation_pct']}%).")
+            anoms_text = "\n".join(anom_list)
+            return f"**Explainable AI (SHAP) Attribution Report for Engine #{unit_number}:**\nOur SHAP attribution models indicate the following key contributors to the predicted RUL of **{int(predicted_rul)} cycles**:\n{anoms_text}\n- **Baseline Lifecycle Wear**: +22.4 cycles wear based on operating cycles ({cycle} cycles elapsed).\n\nThis explains the estimated health index of **{health_score}%**."
+        else:
+            return f"**Explainable AI (SHAP) Attribution Report for Engine #{unit_number}:**\nNo active anomalies or significant sensor drifts detected for Engine #{unit_number} (Health: {health_score}%). The predicted RUL of **{int(predicted_rul)} cycles** is primarily driven by nominal lifecycle wear over the {cycle} operating cycles elapsed."
 
     # 6. General status / RUL queries / "tell me about engine X"
     if any(kw in q for kw in ["rul", "useful life", "fail", "ground", "risk", "status", "health", "condition", "warning", "critical", "alert", "priority", "info", "tell me about", "details", "about engine"]):

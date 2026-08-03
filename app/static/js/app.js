@@ -126,9 +126,8 @@ document.addEventListener("DOMContentLoaded", () => {
   loadDashboardStats();
   loadAnalyticsCharts();
 
-  // Pre-populate prediction form silently with critical template to show non-zero business savings on load
+  // Pre-populate prediction form silently with critical template to show initial parameters on load
   populateSensorForm('critical', false);
-  runDefaultPrediction('critical');
 });
 
 // SPA Tab Switcher
@@ -298,6 +297,12 @@ async function handlePredictionSubmit(e) {
 
 // Render prediction output onto the UI results panels
 function renderPredictionResults(res) {
+  // Reveal results container and hide telemetry ingestion placeholder
+  const placeholder = document.getElementById("prediction-results-placeholder");
+  const content = document.getElementById("prediction-results-content");
+  if (placeholder) placeholder.classList.add("hidden");
+  if (content) content.classList.remove("hidden");
+
   // Populate metrics
   document.getElementById("res-rul").innerText = `${res.predicted_rul} cycles`;
   document.getElementById("res-health").innerText = `${res.health_score}%`;

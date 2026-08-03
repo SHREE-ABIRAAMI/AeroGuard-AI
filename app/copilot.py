@@ -14,6 +14,14 @@ def ask_copilot(unit_number, cycle, predicted_rul, health_score, risk_level, pri
     if not anomaly_text:
         anomaly_text = "No severe sensor drift detected (all channels stable)."
         
+    fleet_info = "- Active Fleet: 30 simulated turbofans (Engine IDs 1 to 30 monitored in dashboard)."
+    if fleet_summary:
+        total_active = len(fleet_summary)
+        critical_count = sum(1 for f in fleet_summary if f["risk_level"] == "Critical")
+        high_count = sum(1 for f in fleet_summary if f["risk_level"] == "High Risk")
+        avg_rul = sum(f["rul"] for f in fleet_summary) / total_active
+        fleet_info = f"- Active Fleet: {total_active} turbofans (IDs 1-30). Average RUL: {avg_rul:.1f} cycles. Risk state: {critical_count} critical, {high_count} high risk assets."
+
     context_prompt = f"""You are the AeroGuard AI Maintenance Copilot, a certified senior turbine aerospace engineer.
 You are troubleshooting Engine #{unit_number} which is currently at cycle {cycle}.
 Here are the current telemetry and ML diagnostics:
@@ -21,6 +29,7 @@ Here are the current telemetry and ML diagnostics:
 - Current Health Index: {health_score}%
 - Risk Classification: {risk_level} (Servicing Priority: {priority})
 - Active Sensor Deviations: {anomaly_text}
+- General Fleet Context: Broader dataset scope is 100 engines (IDs 1 to 100). {fleet_info}
 
 Answer the user's question with precise, technical engineering advice. Keep it concise (2-4 sentences max), structured with markdown bold headers, and maintain a highly professional aerospace operator tone.
 
@@ -62,6 +71,29 @@ def get_offline_response(question, unit_number, cycle, predicted_rul, health_sco
     # 2. Simple greetings
     if any(greet in q for greet in ["hello", "hi ", "hey", "greetings", "whats up"]):
         return f"**AeroGuard Copilot Online.** Greetings, engineer. I am ready to assist with diagnostics for Engine #{unit_number} at cycle {cycle}. What system anomalies are we troubleshooting today?"
+        
+    # 2.5 Fleet-wide count & general metrics queries
+    if any(kw in q for kw in ["how many engine", "total engine", "number of engine", "fleet size", "total turbofan", "active engine", "fleet counts"]):
+        if fleet_summary:
+            total_active = len(fleet_summary)
+            critical_count = sum(1 for f in fleet_summary if f["risk_level"] == "Critical")
+            high_count = sum(1 for f in fleet_summary if f["risk_level"] == "High Risk")
+            medium_count = sum(1 for f in fleet_summary if f["risk_level"] == "Medium Risk")
+            low_count = sum(1 for f in fleet_summary if f["risk_level"] == "Low Risk")
+            avg_rul = sum(f["rul"] for f in fleet_summary) / total_active
+            
+            return f"**AeroGuard Fleet Distribution Report:**\n" \
+                   f"- **Total Active Fleet Turbofans**: **{total_active} engines** (Simulated Engine IDs 1 to 30).\n" \
+                   f"- **Broader NASA CMAPSS Scope**: **100 engines** (Engine IDs 1 to 100 available for manual predictions and queries).\n" \
+                   f"- **Average Fleet RUL**: **{avg_rul:.1f} cycles**\n" \
+                   f"- **Risk Stratification Matrix**:\n" \
+                   f"  - 🔴 **Critical Risk (RUL < 15c)**: {critical_count} assets\n" \
+                   f"  - 🟠 **High Risk (RUL 15-45c)**: {high_count} assets\n" \
+                   f"  - 🟡 **Medium Risk (RUL 45-80c)**: {medium_count} assets\n" \
+                   f"  - 🟢 **Low Risk (RUL > 80c)**: {low_count} assets\n\n" \
+                   f"You can query details for any engine by typing its ID (e.g. 'engine 45') or run simulations in the What-If Sandbox."
+        else:
+            return "**AeroGuard Fleet Scope:** The active simulation monitors **30 engines** (IDs 1-30) on the dashboard, while the complete NASA CMAPSS dataset spans **100 engines** (IDs 1-100)."
         
     # 3. Sensor specific troubleshooting (most specific)
     if any(kw in q for kw in ["sensor 11", "ps30", "static pressure"]):

@@ -125,6 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Pre-load dashboard statistics and selector state to initialize the header active asset focus badge
   loadDashboardStats();
   loadAnalyticsCharts();
+  loadSimEngineDetails();
 
   // Pre-populate prediction form silently with critical template to show initial parameters on load
   populateSensorForm('critical', false);
@@ -178,8 +179,10 @@ function switchTab(tabId) {
   } else if (tabId === 'fleet') {
     loadFleetMonitor();
   } else if (tabId === 'explain') {
-    loadModelInfo();
-    renderExplainShapChart();
+    setTimeout(() => {
+      loadModelInfo();
+      renderExplainShapChart();
+    }, 50);
   }
 }
 
@@ -739,6 +742,12 @@ async function loadModelInfo() {
 
 // Render local SHAP bar chart inside the Explainable AI Copilot view
 function renderExplainShapChart() {
+  // Only render if the explain view is active (visible) to prevent Plotly drawing with 0px width
+  const explainView = document.getElementById('view-explain');
+  if (explainView && !explainView.classList.contains('active')) {
+    return;
+  }
+
   const context = window.lastPredictionContext || window.lastSimContext;
   const explainShapContainer = document.getElementById('explain-shap-bar-chart');
   if (!explainShapContainer) return;

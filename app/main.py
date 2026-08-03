@@ -590,8 +590,16 @@ async def copilot_chat(req: CopilotRequest):
             "priority": m["maintenance_priority"]
         })
 
-    # Regex detect explicit engine focus requests e.g. "engine 2" or "unit 2"
+    # Regex detect explicit engine focus requests e.g. "engine 2" or "unit 2", or standalone digits e.g. "100"
     match = re.search(r'(?:engine|unit|#)\s*(\d+)', req.question.lower())
+    if not match and req.question.strip().isdigit():
+        class MockMatch:
+            def __init__(self, val):
+                self.val = val
+            def group(self, idx):
+                return self.val
+        match = MockMatch(req.question.strip())
+
     if match:
         target_unit = int(match.group(1))
         if target_unit in SIMULATED_FLEET:

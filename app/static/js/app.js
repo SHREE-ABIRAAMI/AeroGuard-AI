@@ -180,7 +180,6 @@ function switchTab(tabId) {
     loadFleetMonitor();
   } else if (tabId === 'explain') {
     setTimeout(() => {
-      loadModelInfo();
       renderExplainShapChart();
     }, 50);
   }
@@ -797,7 +796,7 @@ function renderExplainShapChart() {
     xaxis: { gridcolor: 'rgba(168, 85, 247, 0.05)', tickfont: { color: '#c084fc' }, title: 'RUL Impact (Cycles)' },
     yaxis: { tickfont: { color: '#c084fc' }, automargin: true },
     margin: { l: 150, r: 20, t: 40, b: 40 },
-    height: 300
+    height: 480
   };
 
   Plotly.newPlot('explain-shap-bar-chart', [trace], layout, { responsive: true, displayModeBar: false });

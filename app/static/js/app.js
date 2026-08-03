@@ -1231,7 +1231,21 @@ async function loadSystemLogs() {
     if (!res.ok) throw new Error("Logger API error");
     const data = await res.json();
     
-    const logsHtml = data.logs.join("\n");
+    // Format each log entry using the client's local time zone!
+    const formattedLogs = data.logs.map(log => {
+      // Handle both old string format (fallback) and new dict format
+      if (typeof log === 'string') return log;
+      
+      const date = new Date(log.timestamp * 1000);
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      const localTime = `${hours}:${minutes}:${seconds}`;
+      
+      return `[${localTime}] ${log.message}`;
+    });
+    
+    const logsHtml = formattedLogs.join("\n");
     
     // Detect if user scrolled up, if not, auto-scroll to bottom
     const isScrolledToBottom = terminal.scrollHeight - terminal.clientHeight <= terminal.scrollTop + 20;

@@ -45,8 +45,11 @@ from collections import deque
 SYSTEM_LOGS = deque(maxlen=100)
 
 def log_event(message: str):
-    timestamp = time.strftime("%H:%M:%S")
-    SYSTEM_LOGS.append(f"[{timestamp}] {message}")
+    import time
+    SYSTEM_LOGS.append({
+        "timestamp": time.time(),
+        "message": message
+    })
 
 # Global dataset caches
 TRAIN_DF = None

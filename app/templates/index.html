@@ -536,103 +536,112 @@
             <!-- Parameters input form -->
             <form id="sensor-prediction-form" style="display: flex; flex-direction: column; gap: 20px;">
               
-              <!-- Identifiers -->
-              <div class="engine-cycle-input-grid">
-                <div class="form-group">
-                  <label>Engine ID</label>
-                  <input type="number" id="input-unit-number" name="unit_number" required value="1">
-                </div>
-                <div class="form-group">
-                  <label>Operating Cycle</label>
-                  <input type="number" id="input-cycles" name="time_in_cycles" required value="1">
-                </div>
-              </div>
-
-              <!-- Sensor Categories Tab Navigation (De-cluttering manual inputs) -->
-              <div class="tab-header" style="border-bottom: 1px solid rgba(255,255,255,0.03); margin-bottom: 16px; padding-bottom: 0; gap: 16px;">
-                <button type="button" onclick="switchSensorGroup('thermal')" id="sensor-tab-thermal-btn" class="sub-tab-btn active" style="font-size: 0.68rem; padding-bottom: 8px;">
-                  Thermal Profiles
-                </button>
-                <button type="button" onclick="switchSensorGroup('speed')" id="sensor-tab-speed-btn" class="sub-tab-btn" style="font-size: 0.68rem; padding-bottom: 8px;">
-                  Speed & Pressure
-                </button>
-                <button type="button" onclick="switchSensorGroup('fluid')" id="sensor-tab-fluid-btn" class="sub-tab-btn" style="font-size: 0.68rem; padding-bottom: 8px;">
-                  Fuel & Coolant
-                </button>
-              </div>
-
-              <!-- Sensor Inputs Content -->
-              <div id="sensor-group-thermal" class="form-grid">
-                <div class="form-group">
-                  <label>T24 LPC Temp (R)</label>
-                  <input type="number" step="any" id="input-sensor-2" name="sensor_2" required>
-                  <span style="font-size: 0.6rem; color: var(--text-dim);">Low Pressure Compressor Temp</span>
-                </div>
-                <div class="form-group">
-                  <label>T30 HPC Temp (R)</label>
-                  <input type="number" step="any" id="input-sensor-3" name="sensor_3" required>
-                  <span style="font-size: 0.6rem; color: var(--text-dim);">High Pressure Compressor Temp</span>
-                </div>
-                <div class="form-group">
-                  <label>T50 LPT Temp (R)</label>
-                  <input type="number" step="any" id="input-sensor-4" name="sensor_4" required>
-                  <span style="font-size: 0.6rem; color: var(--text-dim);">Low Pressure Turbine Temp</span>
-                </div>
-                <div class="form-group">
-                  <label>htBleed Enthalpy</label>
-                  <input type="number" step="any" id="input-sensor-17" name="sensor_17" required>
-                  <span style="font-size: 0.6rem; color: var(--text-dim);">Bleed Enthalpy flow rate</span>
+              <!-- Identifiers and Core Inputs -->
+              <div class="glass-panel" style="margin-bottom: 0; padding: 16px; background: rgba(0,0,0,0.12);">
+                <h4 style="font-size: 0.72rem; font-weight: 700; color: var(--color-purple); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                  <i class="fa-solid fa-microchip"></i> Turbine Identifiers
+                </h4>
+                <div class="engine-cycle-input-grid">
+                  <div class="form-group">
+                    <label>Engine ID</label>
+                    <input type="number" id="input-unit-number" name="unit_number" required value="1">
+                  </div>
+                  <div class="form-group">
+                    <label>Operating Cycle</label>
+                    <input type="number" id="input-cycles" name="time_in_cycles" required value="1">
+                  </div>
                 </div>
               </div>
 
-              <div id="sensor-group-speed" class="form-grid hidden">
-                <div class="form-group">
-                  <label>Nf Fan Speed (rpm)</label>
-                  <input type="number" step="any" id="input-sensor-8" name="sensor_8" required>
-                  <span style="font-size: 0.6rem; color: var(--text-dim);">Physical Fan Speed</span>
-                </div>
-                <div class="form-group">
-                  <label>NRf Corrected Speed</label>
-                  <input type="number" step="any" id="input-sensor-13" name="sensor_13" required>
-                  <span style="font-size: 0.6rem; color: var(--text-dim);">Corrected Fan Speed index</span>
-                </div>
-                <div class="form-group">
-                  <label>NRc Core Speed (rpm)</label>
-                  <input type="number" step="any" id="input-sensor-14" name="sensor_14" required>
-                  <span style="font-size: 0.6rem; color: var(--text-dim);">Physical Core Speed</span>
-                </div>
-                <div class="form-group">
-                  <label>P30 HPC Pressure</label>
-                  <input type="number" step="any" id="input-sensor-7" name="sensor_7" required>
-                  <span style="font-size: 0.6rem; color: var(--text-dim);">HP Compressor Outlet Pressure</span>
-                </div>
-                <div class="form-group">
-                  <label>Ps30 Static Pressure</label>
-                  <input type="number" step="any" id="input-sensor-11" name="sensor_11" required>
-                  <span style="font-size: 0.6rem; color: var(--text-dim);">Static Pressure index</span>
+              <!-- Section 1: Thermal Profiles -->
+              <div class="glass-panel" style="margin-bottom: 0; padding: 16px; background: rgba(0,0,0,0.12);">
+                <h4 style="font-size: 0.72rem; font-weight: 700; color: var(--color-cyan); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                  <i class="fa-solid fa-fire-flame-curved"></i> Thermal Sensor Profiles
+                </h4>
+                <div id="sensor-group-thermal" class="form-grid">
+                  <div class="form-group">
+                    <label>T24 LPC Temp (R)</label>
+                    <input type="number" step="any" id="input-sensor-2" name="sensor_2" required>
+                    <span style="font-size: 0.6rem; color: var(--text-dim);">Low Pressure Compressor Temp</span>
+                  </div>
+                  <div class="form-group">
+                    <label>T30 HPC Temp (R)</label>
+                    <input type="number" step="any" id="input-sensor-3" name="sensor_3" required>
+                    <span style="font-size: 0.6rem; color: var(--text-dim);">High Pressure Compressor Temp</span>
+                  </div>
+                  <div class="form-group">
+                    <label>T50 LPT Temp (R)</label>
+                    <input type="number" step="any" id="input-sensor-4" name="sensor_4" required>
+                    <span style="font-size: 0.6rem; color: var(--text-dim);">Low Pressure Turbine Temp</span>
+                  </div>
+                  <div class="form-group">
+                    <label>htBleed Enthalpy</label>
+                    <input type="number" step="any" id="input-sensor-17" name="sensor_17" required>
+                    <span style="font-size: 0.6rem; color: var(--text-dim);">Bleed Enthalpy flow rate</span>
+                  </div>
                 </div>
               </div>
 
-              <div id="sensor-group-fluid" class="form-grid hidden">
-                <div class="form-group">
-                  <label>phi Fuel Ratio</label>
-                  <input type="number" step="any" id="input-sensor-12" name="sensor_12" required>
-                  <span style="font-size: 0.6rem; color: var(--text-dim);">Fuel-air Ratio ratio</span>
+              <!-- Section 2: Rotational Speeds & Pressures -->
+              <div class="glass-panel" style="margin-bottom: 0; padding: 16px; background: rgba(0,0,0,0.12);">
+                <h4 style="font-size: 0.72rem; font-weight: 700; color: var(--color-indigo); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                  <i class="fa-solid fa-gauge-high"></i> Rotational Speeds & Pressures
+                </h4>
+                <div id="sensor-group-speed" class="form-grid">
+                  <div class="form-group">
+                    <label>Nf Fan Speed (rpm)</label>
+                    <input type="number" step="any" id="input-sensor-8" name="sensor_8" required>
+                    <span style="font-size: 0.6rem; color: var(--text-dim);">Physical Fan Speed</span>
+                  </div>
+                  <div class="form-group">
+                    <label>NRf Corrected Speed</label>
+                    <input type="number" step="any" id="input-sensor-13" name="sensor_13" required>
+                    <span style="font-size: 0.6rem; color: var(--text-dim);">Corrected Fan Speed index</span>
+                  </div>
+                  <div class="form-group">
+                    <label>NRc Core Speed (rpm)</label>
+                    <input type="number" step="any" id="input-sensor-14" name="sensor_14" required>
+                    <span style="font-size: 0.6rem; color: var(--text-dim);">Physical Core Speed</span>
+                  </div>
+                  <div class="form-group">
+                    <label>P30 HPC Pressure</label>
+                    <input type="number" step="any" id="input-sensor-7" name="sensor_7" required>
+                    <span style="font-size: 0.6rem; color: var(--text-dim);">HP Compressor Outlet Pressure</span>
+                  </div>
+                  <div class="form-group">
+                    <label>Ps30 Static Pressure</label>
+                    <input type="number" step="any" id="input-sensor-11" name="sensor_11" required>
+                    <span style="font-size: 0.6rem; color: var(--text-dim);">Static Pressure index</span>
+                  </div>
                 </div>
-                <div class="form-group">
-                  <label>BPR Bypass Ratio</label>
-                  <input type="number" step="any" id="input-sensor-15" name="sensor_15" required>
-                  <span style="font-size: 0.6rem; color: var(--text-dim);">Bypass Ratio scale</span>
-                </div>
-                <div class="form-group">
-                  <label>W31 HPT Coolant</label>
-                  <input type="number" step="any" id="input-sensor-20" name="sensor_20" required>
-                  <span style="font-size: 0.6rem; color: var(--text-dim);">High Pressure Turbine Coolant</span>
-                </div>
-                <div class="form-group">
-                  <label>W32 LPT Coolant</label>
-                  <input type="number" step="any" id="input-sensor-21" name="sensor_21" required>
-                  <span style="font-size: 0.6rem; color: var(--text-dim);">Low Pressure Turbine Coolant</span>
+              </div>
+
+              <!-- Section 3: Fluid Dynamics & Coolants -->
+              <div class="glass-panel" style="margin-bottom: 0; padding: 16px; background: rgba(0,0,0,0.12);">
+                <h4 style="font-size: 0.72rem; font-weight: 700; color: var(--color-yellow); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                  <i class="fa-solid fa-droplet"></i> Fluid Dynamics & Coolants
+                </h4>
+                <div id="sensor-group-fluid" class="form-grid">
+                  <div class="form-group">
+                    <label>phi Fuel Ratio</label>
+                    <input type="number" step="any" id="input-sensor-12" name="sensor_12" required>
+                    <span style="font-size: 0.6rem; color: var(--text-dim);">Fuel-air Ratio ratio</span>
+                  </div>
+                  <div class="form-group">
+                    <label>BPR Bypass Ratio</label>
+                    <input type="number" step="any" id="input-sensor-15" name="sensor_15" required>
+                    <span style="font-size: 0.6rem; color: var(--text-dim);">Bypass Ratio scale</span>
+                  </div>
+                  <div class="form-group">
+                    <label>W31 HPT Coolant</label>
+                    <input type="number" step="any" id="input-sensor-20" name="sensor_20" required>
+                    <span style="font-size: 0.6rem; color: var(--text-dim);">High Pressure Turbine Coolant</span>
+                  </div>
+                  <div class="form-group">
+                    <label>W32 LPT Coolant</label>
+                    <input type="number" step="any" id="input-sensor-21" name="sensor_21" required>
+                    <span style="font-size: 0.6rem; color: var(--text-dim);">Low Pressure Turbine Coolant</span>
+                  </div>
                 </div>
               </div>
 

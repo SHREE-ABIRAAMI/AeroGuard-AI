@@ -142,6 +142,11 @@ function switchTab(tabId) {
   const activeView = document.getElementById(`view-${tabId}`);
   if (activeView) activeView.classList.add("active");
 
+  // Reset scroll position to top of page
+  const contentArea = document.querySelector(".content-area");
+  if (contentArea) contentArea.scrollTop = 0;
+  window.scrollTo(0, 0);
+
   // Show/Hide sidebar depending on Landing page tab
   const sidebar = document.getElementById("app-sidebar");
   if (sidebar) {

@@ -323,6 +323,13 @@ export default function App() {
     }
   }, [activeTab, datasetPage, datasetFilterUnit]);
 
+  // Reset scroll position on activeTab changes
+  useEffect(() => {
+    const contentArea = document.querySelector(".content-area");
+    if (contentArea) contentArea.scrollTop = 0;
+    window.scrollTo(0, 0);
+  }, [activeTab]);
+
   // Play/Pause ticker hook
   useEffect(() => {
     if (simPlaying) {
